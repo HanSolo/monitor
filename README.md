@@ -4,7 +4,7 @@ A JavaFX component that can be used to visualize either stored or live data
 Donations are welcome at [Paypal](https://paypal.me/hans0l0)
 
 ### Description
-![Overview](https://raw.githubusercontent.com/HanSolo/monitor/main/monitorBig.jpg)
+![Overview](https://github.com/HanSolo/monitor/raw/main/monitorBig.jpg)
 
 The monitor control is NOT an oscilloscope (even if it looks similar). In principle it moves a dot
 over it's screen with a defined speed where the y value for the dot either comes from data that is
@@ -38,4 +38,4 @@ If the signal amplitude is to high to show it on the screen you can set the scal
 between 0.05 - 10 to scale the signal in y-direction to fit it on the screen.
 
 ### Here is an image that shows the available themes
-![Themes](https://raw.githubusercontent.com/HanSolo/monitor/main/monitor.jpg)
+![Themes](https://github.com/HanSolo/monitor/raw/main/monitor.jpg)
