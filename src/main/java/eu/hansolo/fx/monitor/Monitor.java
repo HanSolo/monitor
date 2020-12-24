@@ -42,6 +42,7 @@ public class Monitor extends Region {
     public  static final double                DEFAULT_SPEED              = 1.6732;
     public  static final double                DEFAULT_SPEED_WIDTH_FACTOR = 1.0;
     public  static final double                DEFAULT_SPEED_FACTOR       = 1.0;
+    public  static final double                DEFAULT_SCALE_FACTOR_Y     = 1.0;
     public  static final double                DEFAULT_LINE_WIDTH         = 3.0;
     public  static final double                DEFAULT_DOT_SIZE           = 4.0;
     public  static final int                   DEFAULT_NO_OF_SEGMENTS     = 75;
@@ -145,7 +146,7 @@ public class Monitor extends Region {
         centerY               = PREFERRED_HEIGHT / 2.0;
         x                     = 0;
         y                     = 0;
-        scaleFactorY          = 1.0;
+        scaleFactorY          = DEFAULT_SCALE_FACTOR_Y;
         queue                 = new FixedSizeQueue<>((int) (noOfSegments / speed));
         lastP                 = new double[] { 0, centerY };
         running               = false;
@@ -312,11 +313,13 @@ public class Monitor extends Region {
             this.timespan     = timespan.getSeconds();
             this.speed        = DEFAULT_SPEED * DEFAULT_TIMESPAN / this.timespan;
             this.currentSpeed = speed * speedWidthFactor * speedFactor;
+            resize();
             timer.start();
         } else {
             this.timespan     = timespan.getSeconds();
             this.speed        = DEFAULT_SPEED * DEFAULT_TIMESPAN / this.timespan;
             this.currentSpeed = speed * speedWidthFactor * speedFactor;
+            resize();
         }
     }
 
@@ -496,8 +499,8 @@ public class Monitor extends Region {
         }
 
         // Draw line elements
-        final Point[] points   = queue.toArray(new Point[0]);
-        final long    length   = points.length;
+        final Point[] points = queue.toArray(new Point[0]);
+        final long    length = points.length;
         if (lineFading) {
             lineCtx.clearRect(0, 0, width, height);
             final double fadeStep = 1.0 / points.length;
