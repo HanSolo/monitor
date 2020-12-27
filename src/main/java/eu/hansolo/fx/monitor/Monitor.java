@@ -105,7 +105,7 @@ public class Monitor extends Region {
     private              boolean               running;
     private              AnimationTimer        timer;
     private              FixedSizeQueue<Point> queue;
-    private              double[] lastP;
+    private              double[]              lastP;
 
 
 
@@ -503,10 +503,10 @@ public class Monitor extends Region {
         final long    length = points.length;
         if (lineFading) {
             lineCtx.clearRect(0, 0, width, height);
-            final double fadeStep = 1.0 / points.length;
+            double opacityFactor = 1.0 / (length - 1);
             for (int i = 0; i < length - 1; i += 1) {
                 if (points[i].x < points[i + 1].x) {
-                    lineCtx.setStroke(Color.color(red, green, blue, i * fadeStep));
+                    lineCtx.setStroke(Color.color(red, green, blue, i * opacityFactor));
                     lineCtx.strokeLine(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
                 }
             }
