@@ -20,8 +20,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 
 public class FixedSizeQueue<E> extends ArrayBlockingQueue<E> {
-    private static final long SERIAL_VERSION_UID = -7772085623838075506L;
-    private              int  size;
+    private int  size;
 
 
     public FixedSizeQueue(final int size) {
@@ -30,7 +29,7 @@ public class FixedSizeQueue<E> extends ArrayBlockingQueue<E> {
     }
 
 
-    @Override synchronized public boolean add(final E element) {
+    @Override public boolean add(final E element) {
         if (super.size() == this.size) { this.remove(); }
         return super.add(element);
     }
