@@ -506,11 +506,8 @@ public class Monitor extends Region {
             final double fadeStep = 1.0 / points.length;
             for (int i = 0; i < length - 1; i += 1) {
                 if (points[i].x < points[i + 1].x) {
-                    lineCtx.beginPath();
-                    lineCtx.moveTo(points[i].x, points[i].y);
-                    lineCtx.lineTo(points[i + 1].x, points[i + 1].y);
                     lineCtx.setStroke(Color.color(red, green, blue, i * fadeStep));
-                    lineCtx.stroke();
+                    lineCtx.strokeLine(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
                 }
             }
         } else {
