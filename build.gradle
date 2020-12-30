@@ -133,7 +133,7 @@ jar {
                 'Bundle-License': 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://spdx.org/licenses/Apache-2.0.html',
                 'Bundle-Description': config.info.description,
                 'Bundle-SymbolicName': 'eu.hansolo.fx.monitor',
-                'Export-Package': 'eu.hansolo.fx.monitor,eu.hansolo.fx.tools'
+                'Export-Package': 'eu.hansolo.fx.monitor,eu.hansolo.fx.monitor.tools'
         )
     }
 }
