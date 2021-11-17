@@ -22,6 +22,7 @@ import javafx.scene.paint.Color;
 
 public enum Theme implements ColorTheme {
     BLUE(Color.rgb(54, 162, 218), Color.rgb(216, 252, 254), Color.BLACK, Color.BLACK),
+    BLUE_GREEN(Color.rgb(0, 137, 164), Color.rgb(0, 251, 221), Color.BLACK, Color.BLACK),
     BLUE_BLACK(Color.BLACK, Color.rgb(66, 249, 252), Color.rgb(25, 126, 40), Color.WHITE),
     DARK_GREEN(Color.rgb(35, 162, 9), Color.rgb(93, 243, 128), Color.BLACK, Color.BLACK),
     GREEN(Color.rgb(30, 132, 119), Color.rgb(177, 246, 238), Color.BLACK, Color.BLACK),

@@ -75,9 +75,9 @@
                                  .timespan(Timespan.FIVE_SECONDS)
                                  .colorTheme(Theme.GREEN)
                                  .speedFactor(1)
-                                 //.noOfSegments(150)
+                                 .noOfSegments(150)
                                  //.scaleFactorY(0.4)
-                                 //.data(EcgData.ECG_DATA)
+                                 .data(EcgData.ECG_DATA)
                                  .build();
 
          //monitor.setRasterColorToLineColor();
