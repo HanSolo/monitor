@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -19,134 +21,105 @@
 plugins {
     id 'idea'
     id 'java-library'
-    id 'org.kordamp.gradle.java-project'
-    id 'org.openjfx.javafxplugin'
-    id 'biz.aQute.bnd.builder'
+    id 'maven-publish'
+    id 'signing'
+    id 'com.google.osdetector'           version '1.7.0'
+    id 'org.javamodularity.moduleplugin' version '1.8.8'
+    id 'org.beryx.jlink'                 version '2.24.2'
+    id 'net.nemerosa.versioning'         version '2.14.0'
+    id 'biz.aQute.bnd.builder'           version '5.3.0'
 }
 
+apply plugin: 'biz.aQute.bnd.builder'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
-if (!project.hasProperty('bintrayUsername'))  ext.bintrayUsername  = '**undefined**'
-if (!project.hasProperty('bintrayApiKey'))    ext.bintrayApiKey    = '**undefined**'
-if (!project.hasProperty('sonatypeUsername')) ext.sonatypeUsername = '**undefined**'
-if (!project.hasProperty('sonatypePassword')) ext.sonatypePassword = '**undefined**'
+description   = 'Monitor is a JavaFX custom control which looks like an oscilloscope'
+mainClassName = "$moduleName/eu.hansolo.fx.monitor.Demo"
 
-config {
-    release = (rootProject.findProperty('release') ?: false).toBoolean()
-
-    info {
-        name          = 'Monitor'
-        description   = 'Monitor is a JavaFX control that can be used to visualize e.g. heartbeat data'
-        vendor        = 'Hansolo'
-        inceptionYear = '2020'
-        tags          = ['javafx', 'monitor']
-
-        links {
-            website      = 'https://github.com/HanSolo/monitor/wiki'
-            issueTracker = 'https://github.com/HanSolo/monitor/issues'
-            scm          = 'https://github.com/HanSolo/monitor.git'
-        }
-
-        people {
-            person {
-                id    = 'HanSolo'
-                name  = 'Gerrit Grunwald'
-                url   = 'https://harmoniccode.blogspot.com/'
-                roles = ['developer']
-            }
-        }
-
-        credentials {
-            sonatype {
-                username = project.sonatypeUsername
-                password = project.sonatypePassword
-            }
-        }
-
-        repositories {
-            repository {
-                name = 'localRelease'
-                url  = "${project.rootProject.buildDir}/repos/local/release"
-            }
-            repository {
-                name = 'localSnapshot'
-                url  = "${project.rootProject.buildDir}/repos/local/snapshot"
-            }
-        }
-    }
-
-    licensing {
-        licenses {
-            license {
-                id = 'Apache-2.0'
-            }
-        }
-    }
-
-    bintray {
-        enabled      = true
-        userOrg      = 'hansolo'
-        repo         = 'monitor'
-        name         = rootProject.name
-        publish      = config.release
-        credentials {
-            username = project.bintrayUsername
-            password = project.bintrayApiKey
-        }
-    }
-
-    publishing {
-        signing             = false
-        releasesRepository  = 'localRelease'
-        snapshotsRepository = 'localSnapshot'
-    }
-
-    docs {
-        javadoc {
-            autoLinks {
-                enabled = false
-            }
-        }
-    }
-}
-
-normalization {
-    runtimeClasspath {
-        ignore('/META-INF/MANIFEST.MF')
-    }
+Date buildTimeAndDate = new Date()
+ext {
+    buildDate       = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
+    buildTime       = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
+    platform        = osdetector.os == 'osx' ? osdetector.arch == 'aarch_64' ? 'mac-aarch64' : 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os == 'linux' ? osdetector.arch == 'aarch_64' ? 'linux-aarch64' : 'linux' : osdetector.os
+    ciOssrhUsername = System.getenv('OSSRH_USERNAME')
+    ciOssrhPassword = System.getenv('OSSRH_PASSWORD')
+    ciGHUser        = System.getenv('GH_USER')
+    ciGHToken       = System.getenv('GH_TOKEN')
+    gpgkey          = System.getenv("GPG_PRIVATE_KEY")
+    gpgpassphrase   = System.getenv("PASSPHRASE")
 }
 
 repositories {
-    jcenter()
     mavenCentral()
 }
 
-javafx {
-    version = javafxVersion
-    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls' ]
+dependencies {
+    implementation "org.openjfx:javafx-base:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"
 }
 
 jar {
     manifest {
         attributes(
-                'Bundle-Name': project.name,
-                'Bundle-License': 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://spdx.org/licenses/Apache-2.0.html',
-                'Bundle-Description': config.info.description,
-                'Bundle-SymbolicName': 'eu.hansolo.fx.monitor',
-                'Export-Package': 'eu.hansolo.fx.monitor,eu.hansolo.fx.monitor.tools'
+                'Built-By'              : System.properties['user.name'],
+                'Created-By'            : System.properties['java.version'] + " (" + System.properties['java.vendor'] + " " + System.properties['java.vm.version'] + ")",
+                'Build-Date'            : project.buildDate,
+                'Build-Time'            : project.buildTime,
+                'Build-Revision'        : versioning.info.commit,
+                'Specification-Title'   : project.name,
+                'Specification-Version' : project.version,
+                'Implementation-Title'  : project.name,
+                'Implementation-Version': project.version,
+                'Bundle-Name'           : project.name,
+                'Bundle-License'        : 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://spdx.org/licenses/Apache-2.0.html',
+                'Bundle-Description'    : description,
+                'Bundle-SymbolicName'   : 'eu.hansolo.fx.monitor',
+                'Export-Package'        : 'eu.hansolo.fx.monitor, eu.hansolo.fx.monitor.tools'
         )
     }
 }
 
-// start the demo from gradle
-task Demo(type: JavaExec) {
-    main = "eu.hansolo.fx.monitor.Launcher"
-    classpath = sourceSets.main.runtimeClasspath
+// create one jar for the javadoc
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// create one jar for the source files
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier = 'sources'
+    from sourceSets.main.allSource
 }
 
 
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
+
+signing {
+    if (gpgkey && gpgpassphrase) {
+        useInMemoryPgpKeys(gpgkey, gpgpassphrase)
+    }
+
+    sign configurations.archives
+    sign publishing.publications
+}
+
 publishing {
     publications {
-        main(MavenPublication) {
+        mavenCustom(MavenPublication) {
+            group = 'eu.hansolo.fx'
+            artifactId = 'monitor'
+            version = "${version}"
+
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+
             pom.withXml {
                 asNode().dependencies.'*'.findAll {
                     it.groupId.text() == 'org.openjfx'
@@ -154,6 +127,55 @@ publishing {
                     it.remove(it.classifier)
                 }
             }
+
+            pom {
+                name = 'monitor'
+                description = 'Monitor is a JavaFX custom control which looks like an oscilloscope'
+                url = "https://github.com/HanSolo/monitor/wiki"
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "HanSolo"
+                        name = "Gerrit Grunwald"
+                        email = "han.solo@mac.com"
+                    }
+                }
+                scm {
+                    connection = "scm:git:https://HanSolo/monitor"
+                    developerConnection = "scm:git:https://HanSolo/monitor"
+                    url = "https://github.com/HanSolo/monitor"
+                }
+            }
         }
     }
+
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+            credentials {
+                username = null == ciOssrhUsername ? ossrhUsername : ciOssrhUsername
+                password = null == ciOssrhPassword ? ossrhPassword : ciOssrhPassword
+            }
+        }
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/HanSolo/monitor"
+            credentials {
+                username = null == ciGHUser  ? ghUser  : ciGHUser
+                password = null == ciGHToken ? ghToken : ciGHToken
+            }
+        }
+    }
+}
+
+// start the demo from gradle
+task Demo(type: JavaExec) {
+    main = "eu.hansolo.fx.monitor.Launcher"
+    classpath = sourceSets.main.runtimeClasspath
 }
